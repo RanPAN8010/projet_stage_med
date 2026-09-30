@@ -1,0 +1,9 @@
+.idea/
+__pycache__/
+*.pyc
+venv/
+.vscode/
+data/*
+!data/.gitkeep
+ai_engine/*
+!ai_engine/.gitkeep
