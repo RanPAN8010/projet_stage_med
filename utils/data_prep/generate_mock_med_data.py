@@ -13,7 +13,7 @@ def generate_mock_med_dataset():
     rows = []
     base_time = datetime.now() - timedelta(minutes=100)
 
-# 1. Normal (60 行)：心率取 168~178，HRV 取 0~40
+    # Normal (60 行)：心率取 168~178，HRV 取 0~40
     for i in range(60):
         t = base_time + timedelta(seconds=i*30)
         hr = np.random.normal(172, 3)
@@ -21,7 +21,7 @@ def generate_mock_med_dataset():
         spo2 = np.random.choice([98, 99, 100])
         rows.append([t.strftime('%Y-%m-%d %H:%M:%S'), round(hr, 1), round(hrv, 2), spo2])
 
-    # 2. Fatigue (25 行)：心率取 75~85，HRV 取 0~2
+    # Fatigue (25 行)：心率取 75~85，HRV 取 0~2
     for i in range(25):
         t = base_time + timedelta(seconds=(60 + i)*30)
         hr = np.random.normal(80, 3)
@@ -29,7 +29,7 @@ def generate_mock_med_dataset():
         spo2 = np.random.choice([95, 96, 97])
         rows.append([t.strftime('%Y-%m-%d %H:%M:%S'), round(hr, 1), round(hrv, 2), spo2])
 
-    # 3. Crise Cardiaque (15 行)：心率取 125~140，HRV 设在 150~220
+    # Crise Cardiaque (15 行)：心率取 125~140，HRV 设在 150~220
     for i in range(15):
         t = base_time + timedelta(seconds=(85 + i)*30)
         hr = np.random.normal(132, 4)

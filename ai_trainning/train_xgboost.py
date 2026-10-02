@@ -7,19 +7,12 @@ from xgboost import XGBClassifier
 import joblib
 
 def train_driver_status_xgboost():
-    # 获取当前脚本的绝对路径 (当前在 edge_server/ai_trainning/med/)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # 向上回溯两级定位到 edge_server 根目录
-    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
-    
-    # 精准定位数据目录与模型输出目录
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
     data_dir = os.path.join(base_project_dir, 'data')
-    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine')
     
     train_data_path = os.path.join(data_dir, 'driver_body_status_train.csv')
-    
-    # 保持原文件名，确保评估脚本自动检索和覆盖
     model_output_path = os.path.join(ai_engine_med_dir, 'xgboost_body_model.joblib')
     scaler_output_path = os.path.join(ai_engine_med_dir, 'data_scaler_xgboost.joblib')
     
@@ -79,10 +72,10 @@ def train_driver_status_xgboost():
     # 确保输出目录存在
     os.makedirs(ai_engine_med_dir, exist_ok=True)
     
-    # 将模型与标准化工具保存至指定的 ai_engine/med/ 文件夹下
+    # 将模型与标准化工具保存至指定的 ai_engine文件夹下
     joblib.dump(model, model_output_path)
     joblib.dump(scaler, scaler_output_path)
-    print(f"Le modèle XGBoost et le standardiseur ont été enregistrés avec succès dans le dossier ai_engine/med.")
+    print(f"Le modèle XGBoost et le standardiseur ont été enregistrés avec succès dans le dossier ai_engine.")
 
 if __name__ == "__main__":
     train_driver_status_xgboost()

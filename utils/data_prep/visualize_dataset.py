@@ -6,12 +6,8 @@ import seaborn as sns
 # Génère et sauvegarde trois graphiques (nuage de points, boîtes à moustaches et 
 # courbes de densité) pour visualiser la distribution des données selon l'état du conducteur.
 def generate_three_french_plots():
-    current_path = os.path.abspath(__file__)
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-    else:
-        return
-        
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
     data_path = os.path.join(base_project_dir, 'data', 'driver_body_status_train.csv')
     output_dir = os.path.join(base_project_dir, 'data')
     

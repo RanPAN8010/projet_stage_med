@@ -4,17 +4,12 @@ import numpy as np
 import joblib
 
 def run_med_inference():
-    # 动态定位项目根目录 edge_server
-    current_path = os.path.abspath(__file__)
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-    else:
-        print("Erreur : Le script n'est pas placé dans le dossier 'edge_server' !")
-        return
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
 
     data_path = os.path.join(base_project_dir, 'data', 'med_sensor_inference_test.csv')
-    scaler_path = os.path.join(base_project_dir, 'ai_engine', 'med', 'data_scaler_xgboost.joblib')
-    model_path = os.path.join(base_project_dir, 'ai_engine', 'med', 'xgboost_body_model.joblib')
+    scaler_path = os.path.join(base_project_dir, 'ai_engine', 'data_scaler_xgboost.joblib')
+    model_path = os.path.join(base_project_dir, 'ai_engine', 'xgboost_body_model.joblib')
     output_path = os.path.join(base_project_dir, 'data', 'med_inference_output.csv')
 
     if not os.path.exists(data_path):

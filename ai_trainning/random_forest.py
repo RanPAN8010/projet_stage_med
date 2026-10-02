@@ -52,7 +52,7 @@ def train_driver_status_model():
     
     joblib.dump(model, model_output_path)
     joblib.dump(scaler, scaler_output_path)
-    print(f"Le modèle KNN et le standardiseur ont été enregistrés avec succès dans le dossier ai_engine.")
+    print(f"Le modèle Random Forest et le standardiseur ont été enregistrés avec succès dans le dossier ai_engine.")
 
 if __name__ == "__main__":
     train_driver_status_model()

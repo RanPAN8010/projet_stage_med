@@ -6,11 +6,8 @@ import numpy as np
 # Extrait les caractéristiques clés du jeu de données cardiaques, les aligne avec 
 # celles de la fatigue, et fusionne le tout dans le jeu d'entraînement final.
 def merge_heart_and_fatigue():
-    current_path = os.path.abspath(__file__)
-    
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-        
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
     data_dir = os.path.join(base_project_dir, 'data')
     
     fatigue_cleaned_path = os.path.join(data_dir, 'fatigueset_cleaned.csv')
@@ -48,7 +45,7 @@ def merge_heart_and_fatigue():
     final_train_df = pd.concat([df_fatigue_reduced, df_heart_prepared], ignore_index=True)
     final_train_df.dropna(inplace=True)
     
-    # 7. 写入最终大表
+    # 写入最终大表
     final_train_df.to_csv(output_path, index=False)
     
     print("\n==========================================")

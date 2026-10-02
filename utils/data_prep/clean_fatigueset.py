@@ -7,11 +7,9 @@ import numpy as np
 # Scanne les dossiers de sessions, filtre la fatigue selon l'enquête, rééchantillonne 
 # les données physiologiques à 1s et les fusionne dans un fichier nettoyé.
 def clean_and_merge_fatigueset():
-    current_path = os.path.abspath(__file__)
-    
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-        
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))    
     base_data_dir = os.path.join(base_project_dir, 'data', 'fatigueset')
     output_dir = os.path.join(base_project_dir, 'data')
     
@@ -87,9 +85,9 @@ def clean_and_merge_fatigueset():
         if df_hr.empty or df_temp.empty or df_rr.empty:
             continue
 
-        print(f"正在处理: 参与者 {participant} -> 场次 {session}")
+        print(f"Traitement en cours : Participant {participant} -> Session {session}")
 
-        # 【核心修正】显式调用具体列名，剔除不兼容的 .iloc
+        # 显式调用具体列名，剔除不兼容的 .iloc
         # wrist_hr.csv 的列名为 timestamp, hr
         resampled_hr = df_hr.resample('1s', on='time')['hr'].mean().reset_index()
         

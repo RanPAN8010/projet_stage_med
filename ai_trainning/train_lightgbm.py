@@ -11,11 +11,11 @@ def train_driver_status_lightgbm():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # 向上回溯两级定位到 edge_server 根目录
-    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
     
     # 精准定位数据目录与模型输出目录
     data_dir = os.path.join(base_project_dir, 'data')
-    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine')
     
     train_data_path = os.path.join(data_dir, 'driver_body_status_train.csv')
     model_output_path = os.path.join(ai_engine_med_dir, 'lightgbm_body_model.joblib')

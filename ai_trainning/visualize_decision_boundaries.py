@@ -9,14 +9,10 @@ import joblib
 # Permet à l'utilisateur de sélectionner un modèle pour générer et sauvegarder 
 # le graphique de ses frontières de décision avec les données réelles.
 def plot_model_boundaries():
-    current_path = os.path.abspath(__file__)
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-    else:
-        return
-        
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
     data_path = os.path.join(base_project_dir, 'data', 'driver_body_status_train.csv')
-    ai_engine_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_dir = os.path.join(base_project_dir, 'ai_engine')
     
     if not os.path.exists(data_path):
         print(f"Erreur : Fichier de données introuvable - {data_path}")

@@ -8,12 +8,11 @@ from lightgbm import LGBMClassifier
 import joblib
 
 def run_hyperparameter_tuning():
-    # 获取当前脚本的绝对路径 (edge_server/ai_trainning/med/)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
     
     data_dir = os.path.join(base_project_dir, 'data')
-    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine')
     train_data_path = os.path.join(data_dir, 'driver_body_status_train.csv')
     
     if not os.path.exists(train_data_path):
@@ -107,7 +106,7 @@ def run_hyperparameter_tuning():
         
     joblib.dump(best_model, os.path.join(ai_engine_med_dir, model_name))
     joblib.dump(scaler, os.path.join(ai_engine_med_dir, "tuned_med_scaler.joblib"))
-    print(f"Modèle sauvegardé dans ai_engine/med/ sous le nom : {model_name}")
+    print(f"Modèle sauvegardé dans ai_engine/ sous le nom : {model_name}")
 
 if __name__ == "__main__":
     run_hyperparameter_tuning()

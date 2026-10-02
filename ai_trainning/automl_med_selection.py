@@ -3,15 +3,11 @@ import pandas as pd
 from pycaret.classification import setup, compare_models, finalize_model, save_model
 
 def run_automl_medical_selection():
-    # 获取当前脚本的绝对路径 (edge_server/ai_trainning/med/)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # 向上回溯两级定位到 edge_server 根目录
-    base_project_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
-    
-    # 精准定位数据目录与模型输出目录
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
+
     data_dir = os.path.join(base_project_dir, 'data')
-    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_med_dir = os.path.join(base_project_dir, 'ai_engine')
     
     train_data_path = os.path.join(data_dir, 'driver_body_status_train.csv')
     model_output_prefix = os.path.join(ai_engine_med_dir, 'best_automl_med_model')
@@ -24,7 +20,7 @@ def run_automl_medical_selection():
     print("Chargement de la base de données pour l'AutoML...")
     df = pd.read_csv(train_data_path)
     
-    # 只提取我们核心关注的二维生理特征和标签
+    # 只提取二维生理特征和标签
     data_for_automl = df[['HeartRate', 'HRV', 'Label']]
     
     print("\n================ CONFIGURATION DE L'EXPÉRIENCE ================")

@@ -8,17 +8,12 @@ import joblib
 # Permet à l'utilisateur de choisir un modèle enregistré, charge son standardiseur 
 # associé, puis évalue ses performances sur le jeu de test via un rapport et une matrice.
 def evaluate_selected_model():
-    # 获取当前脚本的绝对路径
-    current_path = os.path.abspath(__file__)
-    # 动态定位项目根目录 edge_server
-    if "edge_server" in current_path:
-        base_project_dir = current_path.split("edge_server")[0] + "edge_server"
-    else:
-        return
-        
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
+            
     # 定义数据和模型所在的绝对路径
     data_path = os.path.join(base_project_dir, 'data', 'driver_body_status_train.csv')
-    ai_engine_dir = os.path.join(base_project_dir, 'ai_engine', 'med')
+    ai_engine_dir = os.path.join(base_project_dir, 'ai_engine')
     
     # 检查训练集文件是否存在
     if not os.path.exists(data_path):
