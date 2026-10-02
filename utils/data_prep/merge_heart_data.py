@@ -15,6 +15,7 @@ def merge_heart_and_fatigue():
     output_path = os.path.join(data_dir, 'driver_body_status_train.csv')
     
     # 检查前置文件是否存在
+    # Vérifier si le fichier préalable(clean_fatigueset.py) existent.
     if not os.path.exists(fatigue_cleaned_path):
         print(f"Erreur : Fichier nettoyé introuvable.")
         print(f"Chemin attendu : {fatigue_cleaned_path}")
@@ -29,12 +30,14 @@ def merge_heart_and_fatigue():
     df_heart_raw = pd.read_csv(heart_raw_path)
     
     # 通过列的物理位置索引 (iloc) 强制提取核心特征
+    # Extraire les caractéristiques clés via l'indexation de position (.iloc).
     df_heart_prepared = pd.DataFrame()
     df_heart_prepared['HeartRate'] = df_heart_raw.iloc[:, 7]
     df_heart_prepared['HRV'] = df_heart_raw.iloc[:, 9].abs() * 100.0
     df_heart_prepared['Label'] = df_heart_raw.iloc[:, -1].apply(lambda x: 2 if x == 1 else 0)
     
     # 精简列结构
+    # Simplifier la structure des colonnes.
     df_fatigue_reduced = df_fatigue[['HeartRate', 'HRV', 'Label']]
     df_heart_prepared = df_heart_prepared[['HeartRate', 'HRV', 'Label']]
     
@@ -45,7 +48,6 @@ def merge_heart_and_fatigue():
     final_train_df = pd.concat([df_fatigue_reduced, df_heart_prepared], ignore_index=True)
     final_train_df.dropna(inplace=True)
     
-    # 写入最终大表
     final_train_df.to_csv(output_path, index=False)
     
     print("\n==========================================")

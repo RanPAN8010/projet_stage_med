@@ -61,6 +61,7 @@ def clean_and_merge_fatigueset():
         df_rr = pd.read_csv(rr_file)
         
         # 强制将时间戳列转为数值
+        # Convertir de force la colonne des horodatages en valeurs numériques.
         df_hr.iloc[:, 0] = pd.to_numeric(df_hr.iloc[:, 0], errors='coerce')
         df_temp.iloc[:, 0] = pd.to_numeric(df_temp.iloc[:, 0], errors='coerce')
         df_rr.iloc[:, 0] = pd.to_numeric(df_rr.iloc[:, 0], errors='coerce')
@@ -70,6 +71,7 @@ def clean_and_merge_fatigueset():
         df_rr.dropna(subset=[df_rr.columns[0]], inplace=True)
 
         # 智能识别单位
+        # Détecter automatiquement l'unité temporelle (millisecondes ou secondes).
         hr_unit = 'ms' if df_hr.iloc[0, 0] > 1e11 else 's'
         temp_unit = 'ms' if df_temp.iloc[0, 0] > 1e11 else 's'
         rr_unit = 'ms' if df_rr.iloc[0, 0] > 1e11 else 's'
@@ -88,18 +90,23 @@ def clean_and_merge_fatigueset():
         print(f"Traitement en cours : Participant {participant} -> Session {session}")
 
         # 显式调用具体列名，剔除不兼容的 .iloc
+        # Utiliser explicitement les noms de colonnes cibles au lieu d'indexations génériques par .iloc.
         # wrist_hr.csv 的列名为 timestamp, hr
+        # Le fichier wrist_hr.csv contient les colonnes timestamp et hr.
         resampled_hr = df_hr.resample('1s', on='time')['hr'].mean().reset_index()
         
         # wrist_skin_temperature.csv 的列名为 timestamp, temp
+        # Le fichier wrist_skin_temperature.csv contient les colonnes timestamp et temp.
         resampled_temp = df_temp.resample('1s', on='time')['temp'].mean().reset_index()
         
         # chest_rr_interval.csv 的列名为 timestamp, duration
+        # Le fichier chest_rr_interval.csv contient les colonnes timestamp et duration.
         resampled_hrv = df_rr.resample('1s', on='time')['duration'].std().reset_index()
         resampled_hrv.rename(columns={'duration': 'hrv'}, inplace=True)
         resampled_hrv['hrv'] = resampled_hrv['hrv'].fillna(0)
         
         # 横向拼接特征
+        # Fusionner horizontalement les caractéristiques alignées dans le temps.
         session_merged = pd.merge(resampled_hr, resampled_temp, on='time', how='inner')
         session_merged = pd.merge(session_merged, resampled_hrv, on='time', how='inner')
         

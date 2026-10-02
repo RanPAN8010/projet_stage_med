@@ -14,6 +14,7 @@ def generate_mock_med_dataset():
     base_time = datetime.now() - timedelta(minutes=100)
 
     # Normal (60 行)：心率取 168~178，HRV 取 0~40
+    # Normal (60 lignes) : Fréquence cardiaque définie entre 168 et 178 BPM, HRV comprise entre 0 et 40.
     for i in range(60):
         t = base_time + timedelta(seconds=i*30)
         hr = np.random.normal(172, 3)
@@ -22,6 +23,7 @@ def generate_mock_med_dataset():
         rows.append([t.strftime('%Y-%m-%d %H:%M:%S'), round(hr, 1), round(hrv, 2), spo2])
 
     # Fatigue (25 行)：心率取 75~85，HRV 取 0~2
+    # Fatigue (25 lignes) : Fréquence cardiaque définie entre 75 et 85 BPM, HRV comprise entre 0 et 2.
     for i in range(25):
         t = base_time + timedelta(seconds=(60 + i)*30)
         hr = np.random.normal(80, 3)
@@ -30,6 +32,7 @@ def generate_mock_med_dataset():
         rows.append([t.strftime('%Y-%m-%d %H:%M:%S'), round(hr, 1), round(hrv, 2), spo2])
 
     # Crise Cardiaque (15 行)：心率取 125~140，HRV 设在 150~220
+    # Crise Cardiaque (15 lignes) : Fréquence cardiaque définie entre 125 et 140 BPM, HRV comprise entre 150 et 220.
     for i in range(15):
         t = base_time + timedelta(seconds=(85 + i)*30)
         hr = np.random.normal(132, 4)

@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import joblib
 
+# Ce script effectue l'inférence par lots sur des données physiologiques de capteurs via un modèle XGBoost et son standardiseur.
+# Il génère les probabilités par classe, associe les statuts, applique une alerte basée sur la SpO2 et exporte les résultats finaux.
 def run_med_inference():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
@@ -28,7 +30,6 @@ def run_med_inference():
     scaler = joblib.load(scaler_path)
     model = joblib.load(model_path)
 
-    # 提取模型所需的 2 个输入生理特征
     feature_cols = ['HeartRate', 'HRV']
     X_scaled = scaler.transform(df[feature_cols])
 
@@ -37,15 +38,18 @@ def run_med_inference():
     prob_matrix = model.predict_proba(X_scaled)
 
     # 记录三类概率分布
+    # Enregistrer la distribution des probabilités pour les trois classes.
     df['Prob_Normal(0)'] = prob_matrix[:, 0]
     df['Prob_Fatigue(1)'] = prob_matrix[:, 1]
     df['Prob_Crise(2)'] = prob_matrix[:, 2]
 
     # 映射标签状态
+    # Mapper les labels vers les statuts correspondants.
     status_map = {0: 'Normal', 1: 'Fatigue', 2: 'Crise Cardiaque'}
     df['Status'] = df['Predicted_Label'].map(status_map)
 
     # 规则层辅助兜底：若血氧严重过低直接标记为潜在缺氧危险
+    # marquer une alerte d'hypoxie potentielle si la SpO2 est trop basse.
     df['Hypoxie_Warning'] = np.where(df['SpO2'] < 92, True, False)
 
     df.to_csv(output_path, index=False)

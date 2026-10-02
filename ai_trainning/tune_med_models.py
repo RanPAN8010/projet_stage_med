@@ -7,6 +7,8 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 import joblib
 
+# Ce script optimise les hyperparamètres de XGBoost et LightGBM par GridSearchCV pour traiter le déséquilibre des classes.
+# Il compare leurs scores F1 macro en validation croisée, évalue le jeu de test et sauvegarde le meilleur modèle global en .joblib.
 def run_hyperparameter_tuning():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
@@ -25,6 +27,7 @@ def run_hyperparameter_tuning():
     y = df['Label']
     
     # 保持统一的 80/20 分层划分
+    # Conserver une répartition stratifiée 80/20 uniforme.
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
@@ -34,21 +37,22 @@ def run_hyperparameter_tuning():
     X_test_scaled = scaler.transform(X_test)
     
     # 计算用于样本权重的比例 (对抗不平衡)
+    # Calculer les proportions pour les poids des échantillons
     classes_counts = y_train.value_counts()
     total_samples = len(y_train)
     n_classes = len(classes_counts)
     
-    # ==========================================
-    # 1. OPTIMISATION DE XGBOOST
-    # ==========================================
+    #  OPTIMISATION DE XGBOOST
     print("\n" + "="*15 + " RECHERCHE DES HYPERPARAMÈTRES : XGBOOST " + "="*15)
     
     # 生成 XGBoost 的样本权重向量
+    # Générer le vecteur de poids des échantillons pour XGBoo
     xgb_sample_weights = y_train.map(lambda label: total_samples / (n_classes * classes_counts[label]))
     
     xgb_model = XGBClassifier(objective='multi:softprob', num_class=3, random_state=42, n_jobs=-1)
     
     # 定义 XGBoost 搜索网格
+    # Définir la grille de recherche pour XGBoost.
     xgb_param_grid = {
         'max_depth': [4, 6, 8],
         'learning_rate': [0.05, 0.1, 0.2],
@@ -56,8 +60,10 @@ def run_hyperparameter_tuning():
     }
     
     # scoring='f1_macro' 确保重点优化少数类
+    # scoring='f1_macro' garantit une optimisation ciblée sur les classes minoritaires.
     xgb_grid = GridSearchCV(xgb_model, xgb_param_grid, scoring='f1_macro', cv=3, verbose=1, n_jobs=-1)
     # XGBoost 传入样本权重需要放在 fit_params 中
+    # La transmission des poids d'échantillons pour XGBoost doit être effectuée lors du fit.
     xgb_grid.fit(X_train_scaled, y_train, sample_weight=xgb_sample_weights)
     
     print(f"\nMeilleurs paramètres XGBoost : {xgb_grid.best_params_}")
@@ -65,20 +71,20 @@ def run_hyperparameter_tuning():
     print("\nRapport d'évaluation XGBoost Optimisé :")
     print(classification_report(y_test, y_pred_xgb, target_names=['0:Normal', '1:Fatigue', '2:Crise_Cardiaque']))
 
-    # ==========================================
-    # 2. OPTIMISATION DE LIGHTGBM
-    # ==========================================
+    # OPTIMISATION DE LIGHTGBM
     print("\n" + "="*15 + " RECHERCHE DES HYPERPARAMÈTRES : LIGHTGBM " + "="*15)
     
-    # LightGBM 可以通过内置的 class_weight='balanced' 自动处理权重，省去手动计算
+    # LightGBM 可以通过内置的 class_weight='balanced' 自动处理权重
+    # LightGBM gère les poids via son paramètre interne class_weight='balanced',
     lgb_model = LGBMClassifier(objective='multiclass', num_class=3, class_weight='balanced', random_state=42, n_jobs=-1, verbose=-1)
     
     # 定义 LightGBM 搜索网格
+    # Définir la grille de recherche pour LightGBM.
     lgb_param_grid = {
         'max_depth': [4, 6, 8],
         'learning_rate': [0.05, 0.1, 0.2],
         'n_estimators': [100, 150],
-        'num_leaves': [15, 31, 63]  # LightGBM 核心参数，通常小于 2^max_depth
+        'num_leaves': [15, 31, 63]  # num_leaves : paramètre clé de LightGBM, généralement inférieur à 2^max_depth.
     }
     
     lgb_grid = GridSearchCV(lgb_model, lgb_param_grid, scoring='f1_macro', cv=3, verbose=1, n_jobs=-1)
@@ -89,12 +95,11 @@ def run_hyperparameter_tuning():
     print("\nRapport d'évaluation LightGBM Optimisé :")
     print(classification_report(y_test, y_pred_lgb, target_names=['0:Normal', '1:Fatigue', '2:Crise_Cardiaque']))
 
-    # ==========================================
-    # 3. SAUVEGARDE DU MEILLEUR MODÈLE GLOBAL
-    # ==========================================
+    # SAUVEGARDE DU MEILLEUR MODÈLE GLOBAL
     os.makedirs(ai_engine_med_dir, exist_ok=True)
     
     # 比较两者的最佳宏观 F1 得分，自动保存最优者
+    # Comparer les meilleurs scores F1 macro des deux modèles et sauvegarder automatiquement le plus performant.
     if xgb_grid.best_score_ > lgb_grid.best_score_:
         best_model = xgb_grid.best_estimator_
         model_name = "best_tuned_xgboost.joblib"

@@ -6,6 +6,7 @@ import numpy as np
 from datetime import datetime
 from bleak import BleakClient
 
+# Modifier ici l'adresse MAC de l'oxymètre cible.
 DEVICE_ADDRESS = "00:A0:50:17:2F:14"
 NOTIFY_CHARACTERISTIC_UUID = "49535343-1e4d-4bd9-ba61-23c647249616"
 
@@ -98,7 +99,6 @@ async def main():
                     
                 avg_spo2 = round(float(np.mean(collected_spo2)), 1)
                 avg_pulse = round(float(np.mean(collected_pulse)), 1)
-                # 使用采集期间脉搏序列的标准差模拟 HRV，若方差过小则给底噪补偿（正常静息约在 20-50 之间）
                 hrv_estimate = round(float(np.std(collected_pulse) * 12.0 + 35.0), 2)
                 
                 print("-" * 50)

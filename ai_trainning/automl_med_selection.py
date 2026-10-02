@@ -2,6 +2,16 @@ import os
 import pandas as pd
 from pycaret.classification import setup, compare_models, finalize_model, save_model
 
+# ==============================================================================
+# [Description en français]
+# Ce script utilise le framework AutoML PyCaret pour sélectionner et entraîner un modèle
+# de classification sur les données d'état physiologique du conducteur.
+# Il charge les données basées sur la fréquence cardiaque (HeartRate) et la variabilité
+# de la fréquence cardiaque (HRV), traite le déséquilibre des classes, puis compare
+# automatiquement plusieurs algorithmes en privilégiant le score F1.
+# Enfin, le meilleur modèle est réentraîné sur l'intégralité du jeu de données et exporté
+# avec son pipeline de prétraitement au format .pkl.
+# ==============================================================================
 def run_automl_medical_selection():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     base_project_dir = os.path.abspath(os.path.join(current_dir, '..'))
@@ -11,8 +21,7 @@ def run_automl_medical_selection():
     
     train_data_path = os.path.join(data_dir, 'driver_body_status_train.csv')
     model_output_prefix = os.path.join(ai_engine_med_dir, 'best_automl_med_model')
-    
-    # 检查训练集是否存在
+
     if not os.path.exists(train_data_path):
         print(f"Erreur : Base de données introuvable à l'emplacement {train_data_path}.")
         return
@@ -21,14 +30,16 @@ def run_automl_medical_selection():
     df = pd.read_csv(train_data_path)
     
     # 只提取二维生理特征和标签
+    # Extraire uniquement les deux caractéristiques physiologiques et le label.
     data_for_automl = df[['HeartRate', 'HRV', 'Label']]
     
     print("\n================ CONFIGURATION DE L'EXPÉRIENCE ================")
-    # 初始化 PyCaret 环境
-    # target: 预测的目标列
-    # train_size: 训练集比例 (80/20 分割)
-    # fix_imbalance: 自动启用 SMOTE 等算法处理稀少的心脏病样本不平衡问题
-    # html=False: 确保在终端/PowerShell 中以纯文本格式漂亮地打印表格，而不是嵌入网页 HTML
+    # 初始化 PyCaret 环境 Initialiser l'environnement PyCaret.
+    # target: 预测的目标列 Colonne cible à prédire.
+    # train_size: 训练集比例 (80/20 分割) Proportion de l'ensemble d'entraînement (répartition 80/20).
+    # fix_imbalance: Activer automatiquement des algorithmes tels que SMOTE pour gérer 
+    #                le déséquilibre lié aux échantillons rares de maladies cardiaques.
+    # html=False: Assurer un affichage clair sous forme de texte brut dans le terminal/PowerShell
     clf_setup = setup(
         data=data_for_automl,
         target='Label',
@@ -43,9 +54,11 @@ def run_automl_medical_selection():
     print("\n================ COMPARAISON DES MODÈLES D'IA ================")
     print("Évaluation automatique de tous les algorithmes disponibles (RF, KNN, XGBoost, etc.)...")
     
-    # 自动对比所有分类器模型
     # sort='F1': 鉴于医疗高危场景，我们让它优先以 F1-score 作为核心排序标准，平衡精确率与召回率
-    # include: 显式指定重点考察对比的几个核心模型，你也可以删掉这一行让它跑全库十几种模型
+    # sort='F1' : Compte tenu du contexte médical à haut risque, 
+    # le score F1 est utilisé comme critère principal de tri afin d'équilibrer précision et rappel
+    # include: 显式指定重点考察对比的几个核心模型
+    # include : Spécifier explicitement les modèles clés à évaluer,
     best_model = compare_models(
         exclude=['svm', 'gpc', 'rbfsvm'],
         sort='F1',
@@ -54,12 +67,15 @@ def run_automl_medical_selection():
     print("\n================ FINALISATION DU MEILLEUR MODÈLE ================")
     print("Entraînement final sur l'intégralité des données...")
     # 锁定并在全部数据上完整重新训练表现最好的那个模型
+    # réentraîner entièrement le modèle le plus performant sur l'ensemble complet des données.
     final_model = finalize_model(best_model)
     
     # 确保输出目录存在
+    # S'assurer que le répertoire de sortie existe.
     os.makedirs(ai_engine_med_dir, exist_ok=True)
     
-    # 保存最优模型（PyCaret 会自动把标准化预处理 Pipeline 和模型打包在一起保存为 .pkl 文件）
+    # 保存最优模型
+    # Sauvegarder le meilleur modèle dans un fichier .pkl
     save_model(final_model, model_output_prefix)
     print(f"\nLe meilleur modèle a été enregistré avec succès sous : {model_output_prefix}.pkl")
     print("================================================================")
